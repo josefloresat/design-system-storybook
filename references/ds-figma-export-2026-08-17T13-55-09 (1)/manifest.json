@@ -1,0 +1,38 @@
+{
+  "exporter": "DS Component Exporter",
+  "schemaVersion": 1,
+  "exportedAt": "2026-08-17T13:55:09.025Z",
+  "file": {
+    "key": null,
+    "name": "BuckyProject"
+  },
+  "page": {
+    "id": "54690:63",
+    "name": "↪Feedback"
+  },
+  "selection": {
+    "roots": 1,
+    "totalNodes": 33,
+    "componentSets": 1,
+    "components": 4,
+    "instances": 8,
+    "vectors": 12,
+    "rootItems": [
+      {
+        "id": "54690:133",
+        "name": "Toast",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  "options": {
+    "includeVectors": true,
+    "includeAllVariables": false
+  },
+  "output": {
+    "files": 13,
+    "vectorCandidates": 12,
+    "exportedSvgAssets": 6
+  },
+  "warnings": []
+}

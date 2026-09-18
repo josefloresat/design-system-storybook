@@ -1,0 +1,106 @@
+.tokens-page {
+  padding: var(--spacing-2l);
+  font-family: var(--font-family-primary);
+  color: var(--color-text-neutral-primary);
+  background: var(--color-bg-neutral-primary);
+}
+
+.tokens-section {
+  margin-bottom: var(--spacing-3xl);
+}
+
+.tokens-section h2 {
+  font-size: var(--type-h3-size);
+  font-weight: var(--type-h3-weight);
+  margin-bottom: var(--spacing-l);
+}
+
+.tokens-section h3 {
+  font-size: var(--type-subtitle2-size);
+  font-weight: var(--type-subtitle2-weight);
+  margin-bottom: var(--spacing-s);
+  text-transform: capitalize;
+}
+
+.tokens-swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--spacing-l);
+  margin-bottom: var(--spacing-xl);
+}
+
+.tokens-swatch {
+  border: var(--border-width-xs) solid var(--color-border-neutral-gris-3);
+  border-radius: var(--radius-s);
+  overflow: hidden;
+}
+
+.tokens-swatch-color {
+  height: var(--spacing-8xl);
+}
+
+.tokens-swatch-label {
+  padding: var(--spacing-s);
+  font-size: var(--type-body4-regular-size);
+  line-height: var(--type-body4-regular-line-height);
+}
+
+.tokens-swatch-label code {
+  display: block;
+  color: var(--color-text-neutral-secondary);
+  font-size: var(--type-body5-regular-size);
+}
+
+.tokens-type-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-l);
+  padding: var(--spacing-s) 0;
+  border-bottom: var(--border-width-xs) solid var(--color-border-neutral-gris-3);
+}
+
+.tokens-type-row span:first-child {
+  min-width: 140px;
+  color: var(--color-text-neutral-secondary);
+  font-size: var(--type-body4-regular-size);
+}
+
+.tokens-spacing-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-l);
+  margin-bottom: var(--spacing-s);
+}
+
+.tokens-spacing-row span {
+  min-width: 60px;
+  font-size: var(--type-body4-regular-size);
+  color: var(--color-text-neutral-secondary);
+}
+
+.tokens-spacing-bar {
+  height: var(--spacing-l);
+  background: var(--color-bg-brand-default);
+  border-radius: var(--radius-xs);
+}
+
+.tokens-radius-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-l);
+}
+
+.tokens-radius-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  font-size: var(--type-body4-regular-size);
+  color: var(--color-text-neutral-secondary);
+}
+
+.tokens-radius-box {
+  width: var(--spacing-8xl);
+  height: var(--spacing-8xl);
+  background: var(--color-bg-brand-comp-azul-2);
+}
