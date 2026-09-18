@@ -5,6 +5,8 @@ import { HomeDesktopLight } from './HomeDesktopLight';
 const meta = {
   title: 'Pages/HomeDesktopLight',
   component: HomeDesktopLight,
+  // Hidden from the sidebar for now; remove this tag to show it again.
+  tags: ['!dev'],
   parameters: {
     layout: 'fullscreen',
   },
