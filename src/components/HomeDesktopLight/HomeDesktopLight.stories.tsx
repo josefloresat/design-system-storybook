@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { HomeDesktopLight } from './HomeDesktopLight';
 
 const meta = {
-  title: 'Pages/HomeDesktopLight',
+  title: '04 Páginas/HomeDesktopLight',
   component: HomeDesktopLight,
   // Hidden from the sidebar for now; remove this tag to show it again.
   tags: ['!dev'],

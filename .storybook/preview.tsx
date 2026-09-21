@@ -5,7 +5,23 @@ const preview: Preview = {
   parameters: {
     options: {
       storySort: {
-        order: ['Foundations', ['Introduction', 'Design Tokens'], 'Feedback'],
+        order: [
+          '01 Introducción',
+          ['Bienvenida'],
+          '02 Foundations',
+          [
+            'Colors',
+            ['Documentación', 'Primitivos', 'Semánticos'],
+            'Typography',
+            ['Documentación', 'Familias y pesos', 'Escala'],
+            'Effects & Borders',
+            ['Documentación', 'Shadows', 'Borders'],
+            'Layout & Shape',
+            ['Documentación', 'Spacing', 'Border Radius', 'Icon Size', 'Grid'],
+          ],
+          '03 Componentes',
+          '04 Páginas',
+        ],
       },
     },
     controls: {
@@ -15,7 +31,7 @@ const preview: Preview = {
       },
     },
 
-    a11y: {
+    a11y: {x|
       // 'todo' - show a11y violations in the test UI only
       // 'error' - fail CI on a11y violations
       // 'off' - skip a11y checks entirely

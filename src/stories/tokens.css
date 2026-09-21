@@ -159,3 +159,14 @@
   padding: var(--spacing-xs) var(--spacing-l) var(--spacing-xs) 0;
   border-bottom: var(--border-width-xs) solid var(--color-border-neutral-gris-3);
 }
+
+.tokens-shadow-grid {
+  gap: var(--spacing-3xl);
+  margin-bottom: var(--spacing-2xl);
+  padding: var(--spacing-xl) 0;
+}
+
+.tokens-shadow-box {
+  background: var(--color-bg-neutral-primary);
+  border-radius: var(--radius-s);
+}

@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react';
+﻿import type { CSSProperties } from 'react';
 
 import css from '../index.css?raw';
 import './tokens.css';
@@ -130,7 +130,7 @@ const typeStyles = byPrefix('--type-')
   .filter(({ name }) => name.endsWith('-size'))
   .map(({ name }) => name.slice('--type-'.length, -'-size'.length));
 
-export const Typography = () => (
+export const FontFamilies = () => (
   <div className="tokens-page">
     <section className="tokens-section">
       <h2>Font family &amp; weight</h2>
@@ -160,7 +160,11 @@ export const Typography = () => (
         ))}
       </div>
     </section>
+  </div>
+);
 
+export const TypeScale = () => (
+  <div className="tokens-page">
     <section className="tokens-section">
       <h2>Semantic typography (Desktop / Small Device)</h2>
       {typeGroups.map(([title, pattern]) => (
@@ -195,7 +199,8 @@ export const Typography = () => (
   </div>
 );
 
-/* ------------------------------------------------------------------ Units */
+
+/* ---------------------------------------------------------- Layout & Shape */
 
 const TokenTable = ({ tokens }: { tokens: Token[] }) => (
   <table className="tokens-table">
@@ -212,7 +217,7 @@ const TokenTable = ({ tokens }: { tokens: Token[] }) => (
   </table>
 );
 
-export const Units = () => (
+export const Spacing = () => (
   <div className="tokens-page">
     <section className="tokens-section">
       <h2>Spacing</h2>
@@ -224,7 +229,28 @@ export const Units = () => (
         </div>
       ))}
     </section>
+  </div>
+);
 
+export const Radius = () => (
+  <div className="tokens-page">
+    <section className="tokens-section">
+      <h2>Border radius</h2>
+      <div className="tokens-radius-grid">
+        {byPrefix('--radius-').map(({ name, value }) => (
+          <div className="tokens-radius-item" key={name}>
+            <div className="tokens-radius-box" style={{ borderRadius: `var(${name})` }} />
+            <span>{name.replace('--radius-', '')}</span>
+            <span>{value}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+  </div>
+);
+
+export const IconSize = () => (
+  <div className="tokens-page">
     <section className="tokens-section">
       <h2>Icon size</h2>
       <div className="tokens-radius-grid">
@@ -240,7 +266,22 @@ export const Units = () => (
         ))}
       </div>
     </section>
+  </div>
+);
 
+export const Grid = () => (
+  <div className="tokens-page">
+    <section className="tokens-section">
+      <h2>Grid system</h2>
+      <TokenTable tokens={byPrefix('--grid-')} />
+    </section>
+  </div>
+);
+
+/* --------------------------------------------------------- Effects & Borders */
+
+export const Borders = () => (
+  <div className="tokens-page">
     <section className="tokens-section">
       <h2>Border width</h2>
       <div className="tokens-radius-grid">
@@ -256,39 +297,39 @@ export const Units = () => (
         ))}
       </div>
     </section>
-
-    <section className="tokens-section">
-      <h2>Radius</h2>
-      <div className="tokens-radius-grid">
-        {byPrefix('--radius-').map(({ name, value }) => (
-          <div className="tokens-radius-item" key={name}>
-            <div className="tokens-radius-box" style={{ borderRadius: `var(${name})` }} />
-            <span>{name.replace('--radius-', '')}</span>
-            <span>{value}</span>
-          </div>
-        ))}
-      </div>
-    </section>
-
-    <section className="tokens-section">
-      <h2>Grid system</h2>
-      <TokenTable tokens={byPrefix('--grid-')} />
-    </section>
-
-    <section className="tokens-section">
-      <h2>Shadow system</h2>
-      <TokenTable tokens={byPrefix('--shadow-')} />
-    </section>
   </div>
 );
 
-/* --------------------------------------------------------------- Overview */
+/* The export only ships shadow offsets, blur and spread (no color), so the
+   demo pairs y/blur by size and tints them with the neutral overlay. */
+const shadowSizes = ['s', 'm', 'l', 'xl'];
 
-export const Tokens = () => (
-  <>
-    <PrimitiveColors />
-    <SemanticColorsLight />
-    <Typography />
-    <Units />
-  </>
+export const Shadows = () => (
+  <div className="tokens-page">
+    <section className="tokens-section">
+      <h2>Shadow system</h2>
+      <p className="tokens-note">
+        Los tokens definen desplazamiento, blur y spread; el color de la muestra es solo ilustrativo
+        (<code>--color-overlay-20</code>).
+      </p>
+      <div className="tokens-radius-grid tokens-shadow-grid">
+        {shadowSizes.map((size) => (
+          <div className="tokens-radius-item" key={size}>
+            <div
+              className="tokens-radius-box tokens-shadow-box"
+              style={{
+                boxShadow: `var(--shadow-x-s) var(--shadow-y-${size}) var(--shadow-blur-${size}) var(--shadow-spread-s) var(--color-overlay-20)`,
+              }}
+            />
+            <span>{size}</span>
+            <span>
+              y {rootVars.get(`--shadow-y-${size}`)?.value} / blur{' '}
+              {rootVars.get(`--shadow-blur-${size}`)?.value}
+            </span>
+          </div>
+        ))}
+      </div>
+      <TokenTable tokens={byPrefix('--shadow-')} />
+    </section>
+  </div>
 );

@@ -5,7 +5,7 @@ import { fn } from 'storybook/test';
 import { Toast } from './Toast';
 
 const meta = {
-  title: 'Feedback/Toast',
+  title: '03 Componentes/Toast',
   component: Toast,
   parameters: {
     layout: 'centered',
