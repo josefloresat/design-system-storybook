@@ -1,0 +1,4 @@
+.docs-story[data-theme] {
+  background-color: var(--color-bg-neutral-primary);
+  color: var(--color-text-neutral-primary);
+}

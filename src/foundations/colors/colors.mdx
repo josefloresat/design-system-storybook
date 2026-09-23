@@ -1,0 +1,54 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+import * as ColorsStories from './colors.stories';
+
+<Meta of={ColorsStories} name="Documentación" />
+
+# Colors
+
+El color se organiza en dos niveles. Todos los valores se leen de `src/index.css`.
+
+## Primitivos
+
+Valores base sin propósito asociado. Son la materia prima de la que se derivan los semánticos.
+
+| Familia | Tokens |
+| --- | --- |
+| Brand | `--color-brand-rojo-*`, `--color-brand-amarillo-*`, `--color-brand-verde-*`, `--color-brand-azul-*` |
+| Green, Yellow, Blue, Red | `--color-{familia}-50` a `--color-{familia}-900` |
+| Neutral | `--color-neutral-0` a `--color-neutral-900` |
+| Opacity | `--color-overlay-10` a `--color-overlay-90` |
+
+## Semánticos
+
+Alias con propósito que consumen primitivos. **Usa siempre estos en los componentes.**
+
+| Grupo | Prefijo | Para qué |
+| --- | --- | --- |
+| Background | `--color-bg-*` | Superficies y rellenos (brand, feedback, neutral) |
+| Border | `--color-border-*` | Bordes y divisores |
+| Text | `--color-text-*` | Texto sobre cada superficie |
+
+Dentro de cada grupo el segundo segmento indica la familia (`brand`, `feedback`, `neutral`) y el último el rol o estado (`default`, `hover`, `pressed`, `primary`, `success`, `error`…).
+
+```css
+.card {
+  background: var(--color-bg-neutral-primary);
+  color: var(--color-text-neutral-primary);
+  border: var(--border-width-xs) solid var(--color-border-neutral-gris-3);
+}
+.card:hover {
+  border-color: var(--color-border-brand-hover);
+}
+```
+
+## Modo claro y oscuro
+
+Light es el modo por defecto. Dark solo cambia el par neutro superficie/texto:
+
+- `--color-bg-neutral-primary`
+- `--color-bg-neutral-inverse`
+- `--color-text-neutral-primary`
+- `--color-text-neutral-invert`
+
+En Storybook se cambia con el switch «Tema oscuro» de la barra superior, que solo afecta el fondo donde se ve el componente. Fuera de Storybook se activa con la preferencia del sistema o forzándolo con `data-theme="dark"` / `data-theme="light"` en un elemento.

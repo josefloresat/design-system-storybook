@@ -1,13 +1,32 @@
 import type { Preview } from '@storybook/react-vite'
+import { addons } from 'storybook/preview-api'
+import { DOCS_RENDERED } from 'storybook/internal/core-events'
+
 import '../src/index.css'
+import './docs-theme.css'
+import { ThemeBoundary } from './theme-boundary'
+import { resolveTheme, themeGlobalKey, themes } from './themes'
+
+addons.getChannel().on(DOCS_RENDERED, () => {
+  document.documentElement.dataset.theme = themes.light
+})
 
 const preview: Preview = {
+  initialGlobals: { [themeGlobalKey]: themes.light },
+  decorators: [
+    (Story, { globals, viewMode }) => (
+      <ThemeBoundary theme={resolveTheme(globals[themeGlobalKey])} isDocs={viewMode === 'docs'}>
+        <Story />
+      </ThemeBoundary>
+    ),
+  ],
   parameters: {
+    backgrounds: { disabled: true },
     options: {
       storySort: {
         order: [
           '01 Introducción',
-          ['Bienvenida'],
+          ['Bienvenida', 'Consumo entre equipos'],
           '02 Foundations',
           [
             'Colors',
@@ -20,6 +39,13 @@ const preview: Preview = {
             ['Documentación', 'Spacing', 'Border Radius', 'Icon Size', 'Grid'],
           ],
           '03 Componentes',
+          [
+            'Actions',
+            'Selections',
+            'Navigation',
+            'Feedback',
+            'Text Field',
+          ],
           '04 Páginas',
         ],
       },

@@ -1,0 +1,46 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+import * as EffectsStories from './effects-and-borders.stories';
+
+<Meta of={EffectsStories} name="Documentación" />
+
+# Effects & Borders
+
+## Shadows
+
+La sombra se compone de piezas sueltas; el export de Figma no incluye color.
+
+| Token | Valores |
+| --- | --- |
+| `--shadow-x-s` | 0px |
+| `--shadow-y-s`, `-m`, `-l`, `-xl` | 0px, 4px, 8px, 40px |
+| `--shadow-blur-s`, `-m`, `-l`, `-xl` | 8px, 24px, 32px, 64px |
+| `--shadow-spread-s` | 0px |
+
+La story combina `y` y `blur` del mismo tamaño y usa `--color-overlay-20` como color de muestra.
+
+```css
+.card {
+  box-shadow: var(--shadow-x-s) var(--shadow-y-m) var(--shadow-blur-m) var(--shadow-spread-s)
+    var(--color-overlay-20);
+}
+```
+
+## Borders
+
+Grosores de borde disponibles:
+
+| Token | Valor |
+| --- | --- |
+| `--border-width-none` | 0px |
+| `--border-width-xxs` | 0.5px |
+| `--border-width-xs` | 1px |
+| `--border-width-s` | 2px |
+
+Combínalos con un color `--color-border-*`:
+
+```css
+.input {
+  border: var(--border-width-xs) solid var(--color-border-neutral-gris-3);
+}
+```

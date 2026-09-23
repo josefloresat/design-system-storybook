@@ -1,0 +1,47 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="01 Introducción/Consumo entre equipos" />
+
+# Consumo entre equipos
+
+Este design system tiene un solo dueño (el equipo de frontend) pero más de un consumidor: hoy frontend, y a futuro equipos como Casino, cada uno en su propio proyecto Next.js. Esta página explica cómo un equipo distinto al dueño puede usar y personalizar lo que hay acá sin romper la consistencia visual de la plataforma. La decisión completa, con el razonamiento, está en `docs/adr/0001-tokens-contract-for-cross-team-consumption.md`.
+
+## Dos formas de consumo, un solo paquete
+
+| Entry point | Qué trae | Para quién |
+| --- | --- | --- |
+| **`ui`** | Los componentes oficiales (Button, ...) ya armados | Un equipo que necesita un componente del Components Standard tal cual está |
+| **`tokens`** | Solo las variables CSS de `src/index.css`, sin componentes | Un equipo que construye un componente propio, no estándar, que debe verse parte del sistema |
+
+Ningún equipo instala "el design system" a secas — instala uno de estos dos, según lo que necesite.
+
+## La regla que no se negocia: el Tokens Contract
+
+Sea un componente oficial o uno propio de un equipo, **el valor crudo de color, tipografía, spacing, radio o sombra sale siempre de un token semántico**, nunca de un valor escrito a mano. Un componente propio de Casino, por ejemplo, no importa `ui`, pero sí `tokens`, y su CSS se ve así:
+
+```css
+.casino-odds-widget {
+  background: var(--color-bg-brand-default);
+  color: var(--color-text-neutral-primary);
+  border-radius: var(--radius-md);
+}
+```
+
+Nunca `background: #E4002B`. Esto es lo que garantiza que un widget que el equipo de frontend nunca vio se sienta parte de la misma plataforma — y de paso hereda Light/Dark automáticamente, porque los tokens semánticos cambian solos con `data-theme`.
+
+## Personalizar un componente oficial
+
+Un componente como Button no se edita ni se copia. Se personaliza solo por dos vías:
+
+- **Las props que ya expone** — `variant`, `size`, y cualquier atributo HTML nativo (`onClick`, `disabled`, ...) que pase por spread.
+- **Un ticket**, si lo que hace falta no existe todavía (una variante nueva, un token nuevo). Sigue el proceso normal en `.scratch/` con las labels de siempre — `needs-info` si falta el token, `ready-for-agent` si ya existe.
+
+Lo que nunca pasa: un equipo forkeando el código de Button para ajustarlo a su gusto. Eso rompe la fuente única de verdad — ver ADR-0001 para por qué se descartó ese modelo (tipo shadcn).
+
+## Componentes que no son del Components Standard
+
+Si lo que un equipo necesita no encaja en ninguna de las cinco categorías fijas (Actions, Selections, Navigation, Feedback, Text Field), ese componente **no entra a este Storybook**, sin importar qué tan reusable sea. Vive en el repo del equipo que lo necesita, construido contra `tokens`. Si con el tiempo resulta útil para más de un equipo, recién ahí se evalúa como candidato a componente oficial — por el mismo proceso de ticket, no por excepción.
+
+## Estado actual
+
+Esta página documenta el contrato ya decidido. El empaquetado técnico (separar `tokens`/`ui` como entry points reales, build de librería, publicación a un registro o monorepo) todavía no está implementado — hoy este repo sigue siendo Storybook-only.

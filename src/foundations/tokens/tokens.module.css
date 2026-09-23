@@ -1,0 +1,172 @@
+.tokens {
+  padding: var(--spacing-2l);
+  font-family: var(--font-family-primary);
+  color: var(--color-text-neutral-primary);
+  background: var(--color-bg-neutral-primary);
+}
+
+.tokens__section {
+  margin-bottom: var(--spacing-3xl);
+}
+
+.tokens__section h2 {
+  font-size: var(--type-h3-size);
+  font-weight: var(--type-h3-weight);
+  margin-bottom: var(--spacing-l);
+}
+
+.tokens__section h3 {
+  font-size: var(--type-subtitle2-size);
+  font-weight: var(--type-subtitle2-weight);
+  margin-bottom: var(--spacing-s);
+  text-transform: capitalize;
+}
+
+.tokens__swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--spacing-l);
+  margin-bottom: var(--spacing-xl);
+}
+
+.tokens__swatch {
+  border: var(--border-width-xs) solid var(--color-border-neutral-gris-3);
+  border-radius: var(--radius-s);
+  overflow: hidden;
+}
+
+.tokens__swatch-color {
+  height: var(--spacing-8xl);
+}
+
+.tokens__swatch-label {
+  padding: var(--spacing-s);
+  font-size: var(--type-body4-regular-size);
+  line-height: var(--type-body4-regular-line-height);
+}
+
+.tokens__swatch-label code {
+  display: block;
+  color: var(--color-text-neutral-secondary);
+  font-size: var(--type-body5-regular-size);
+}
+
+.tokens__type-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-l);
+  padding: var(--spacing-s) 0;
+  border-bottom: var(--border-width-xs) solid var(--color-border-neutral-gris-3);
+}
+
+.tokens__type-row span:first-child {
+  min-width: 200px;
+  color: var(--color-text-neutral-secondary);
+  font-size: var(--type-body4-regular-size);
+}
+
+.tokens__type-row code {
+  display: block;
+  font-size: var(--type-body5-regular-size);
+}
+
+.tokens__spacing-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-l);
+  margin-bottom: var(--spacing-s);
+}
+
+.tokens__spacing-row span {
+  min-width: 60px;
+  font-size: var(--type-body4-regular-size);
+  color: var(--color-text-neutral-secondary);
+}
+
+.tokens__spacing-bar {
+  height: var(--spacing-l);
+  background: var(--color-bg-brand-default);
+  border-radius: var(--radius-xs);
+}
+
+.tokens__radius-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-l);
+}
+
+.tokens__radius-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  font-size: var(--type-body4-regular-size);
+  color: var(--color-text-neutral-secondary);
+}
+
+.tokens__radius-box {
+  width: var(--spacing-8xl);
+  height: var(--spacing-8xl);
+  background: var(--color-bg-brand-comp-azul-2);
+}
+
+.tokens__swatch-label code {
+  word-break: break-all;
+}
+
+/* Checkerboard so alpha colors (overlay) are visible */
+.tokens__swatch-color--checker {
+  background-color: var(--color-neutral-0);
+  background-image:
+    linear-gradient(45deg, var(--color-neutral-300) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--color-neutral-300) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--color-neutral-300) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--color-neutral-300) 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+}
+
+.tokens__swatch-fill {
+  width: 100%;
+  height: 100%;
+}
+
+.tokens__note {
+  margin: 0 0 var(--spacing-l);
+  color: var(--color-text-neutral-secondary);
+  font-size: var(--type-body3-regular-size);
+}
+
+.tokens__font-sample {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--spacing-8xl);
+  font-size: var(--type-h1-size);
+}
+
+.tokens__radius-box--border {
+  background: transparent;
+  border: solid var(--color-border-neutral-primary);
+}
+
+.tokens__table {
+  border-collapse: collapse;
+  font-size: var(--type-body3-regular-size);
+}
+
+.tokens__table td {
+  padding: var(--spacing-xs) var(--spacing-l) var(--spacing-xs) 0;
+  border-bottom: var(--border-width-xs) solid var(--color-border-neutral-gris-3);
+}
+
+.tokens__radius-grid--shadow {
+  gap: var(--spacing-3xl);
+  margin-bottom: var(--spacing-2xl);
+  padding: var(--spacing-xl) 0;
+}
+
+.tokens__radius-box--shadow {
+  background: var(--color-bg-neutral-primary);
+  border-radius: var(--radius-s);
+}

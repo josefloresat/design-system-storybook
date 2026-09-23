@@ -1,0 +1,224 @@
+/*
+ * Each state only sets the --btn-* custom properties; the base rule composes them.
+ * The stroke is an inset shadow so it never changes the button size (Figma strokes are inside).
+ * `.is-hovered`, `.is-pressed` and `.is-focused` mirror the real pseudo-classes so stories can show every state at once.
+ */
+.button {
+  --btn-bg: transparent;
+  --btn-fg: var(--color-text-neutral-primary);
+  --btn-stroke-width: 0px;
+  --btn-stroke-color: transparent;
+  --btn-elevation: 0 3px var(--shadow-blur-s) var(--shadow-spread-s) var(--color-overlay-10);
+
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  margin: 0;
+  border: 0;
+  background-color: var(--btn-bg);
+  box-shadow: inset 0 0 0 var(--btn-stroke-width) var(--btn-stroke-color), var(--btn-elevation);
+  color: var(--btn-fg);
+  font-family: var(--font-family-primary);
+  cursor: pointer;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+}
+
+/* Sizes */
+.button--lg {
+  gap: var(--spacing-3s);
+  height: var(--spacing-4xl);
+  padding: var(--spacing-l);
+  border-radius: var(--radius-2s);
+  font-size: var(--type-button1-size);
+  font-weight: var(--type-button1-weight);
+  line-height: var(--type-button1-line-height);
+  letter-spacing: var(--type-button1-letter-spacing);
+}
+
+.button--md {
+  gap: var(--spacing-3s);
+  height: var(--spacing-3xl);
+  padding: var(--spacing-3s) var(--spacing-2s);
+  border-radius: var(--radius-s);
+  font-size: var(--type-button2-size);
+  font-weight: var(--type-button2-weight);
+  line-height: var(--type-button2-line-height);
+  letter-spacing: var(--type-button2-letter-spacing);
+}
+
+.button--sm {
+  gap: var(--spacing-s);
+  height: var(--spacing-2xl);
+  padding: var(--spacing-2xs);
+  border-radius: var(--radius-3xs);
+  font-size: var(--type-button3-size);
+  font-weight: var(--type-button3-weight);
+  line-height: var(--type-button3-line-height);
+  letter-spacing: var(--type-button3-letter-spacing);
+}
+
+.button--xs {
+  gap: var(--spacing-xs);
+  height: var(--spacing-xl);
+  padding: var(--spacing-xs);
+  border-radius: var(--radius-2xs);
+  font-size: var(--type-button3-size);
+  font-weight: var(--type-button3-weight);
+  line-height: var(--type-button3-line-height);
+  letter-spacing: var(--type-button3-letter-spacing);
+}
+
+.button__label {
+  white-space: nowrap;
+}
+
+/* Chevrons are the exported Figma glyphs, tinted with the text color through a mask */
+.button__icon {
+  display: block;
+  flex-shrink: 0;
+  width: var(--icon-size-s);
+  height: var(--icon-size-s);
+  background-color: currentColor;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+.button__icon--left {
+  -webkit-mask-image: url('./assets/icons/chevron-left.svg');
+  mask-image: url('./assets/icons/chevron-left.svg');
+}
+
+.button__icon--right {
+  -webkit-mask-image: url('./assets/icons/chevron-right.svg');
+  mask-image: url('./assets/icons/chevron-right.svg');
+}
+
+/* Primary */
+.button--primary {
+  --btn-bg: var(--color-bg-brand-default);
+  --btn-fg: var(--color-bg-neutral-primary);
+}
+
+.button--primary:hover:not(:disabled),
+.button--primary:global(.is-hovered) {
+  --btn-bg: var(--color-bg-brand-hover);
+}
+
+.button--primary:active:not(:disabled),
+.button--primary:global(.is-pressed) {
+  --btn-bg: var(--color-bg-brand-pressed);
+}
+
+.button--primary:focus-visible,
+.button--primary:global(.is-focused) {
+  --btn-bg: var(--color-bg-brand-default);
+  --btn-stroke-width: var(--border-width-s);
+  --btn-stroke-color: var(--color-border-neutral-primary);
+}
+
+.button--primary:disabled {
+  --btn-bg: var(--color-bg-neutral-disabled);
+  --btn-fg: var(--color-text-neutral-gris-1);
+  --btn-stroke-width: 0px;
+  --btn-elevation: 0 0 0 0 transparent;
+}
+
+/* Secondary */
+.button--secondary {
+  --btn-bg: var(--color-bg-neutral-primary);
+  --btn-fg: var(--color-text-brand-primary);
+  --btn-stroke-width: var(--border-width-xs);
+  --btn-stroke-color: var(--color-border-brand-default);
+}
+
+.button--secondary:hover:not(:disabled),
+.button--secondary:global(.is-hovered) {
+  --btn-fg: var(--color-text-brand-secondary);
+  --btn-stroke-color: var(--color-border-brand-hover);
+}
+
+.button--secondary:active:not(:disabled),
+.button--secondary:global(.is-pressed) {
+  --btn-fg: var(--color-text-brand-tertiary);
+  --btn-stroke-color: var(--color-border-brand-pressed);
+}
+
+.button--secondary:focus-visible,
+.button--secondary:global(.is-focused) {
+  --btn-fg: var(--color-text-brand-secondary);
+  --btn-stroke-width: var(--border-width-s);
+  --btn-stroke-color: var(--color-border-neutral-primary);
+}
+
+.button--secondary:disabled {
+  --btn-bg: var(--color-bg-neutral-disabled);
+  --btn-fg: var(--color-text-neutral-gris-1);
+  --btn-stroke-width: var(--border-width-xs);
+  --btn-stroke-color: var(--color-border-neutral-gris-1);
+  --btn-elevation: 0 0 0 0 transparent;
+}
+
+/* Tertiary */
+.button--tertiary {
+  --btn-bg: var(--color-bg-neutral-primary);
+  --btn-fg: var(--color-text-neutral-primary);
+}
+
+.button--tertiary:hover:not(:disabled),
+.button--tertiary:global(.is-hovered) {
+  --btn-bg: var(--color-bg-neutral-secondary);
+}
+
+.button--tertiary:active:not(:disabled),
+.button--tertiary:global(.is-pressed) {
+  --btn-stroke-width: var(--border-width-xs);
+  --btn-stroke-color: var(--color-border-neutral-gris-1);
+}
+
+.button--tertiary:focus-visible,
+.button--tertiary:global(.is-focused) {
+  --btn-bg: var(--color-bg-neutral-primary);
+  --btn-stroke-width: var(--border-width-s);
+  --btn-stroke-color: var(--color-border-neutral-primary);
+}
+
+.button--tertiary:disabled {
+  --btn-bg: var(--color-bg-neutral-disabled);
+  --btn-fg: var(--color-text-neutral-gris-1);
+  --btn-stroke-width: 0px;
+  --btn-elevation: 0 0 0 0 transparent;
+}
+
+/* Link */
+.button--link {
+  --btn-fg: var(--color-text-neutral-primary);
+  --btn-elevation: 0 0 0 0 transparent;
+}
+
+.button--link:hover:not(:disabled),
+.button--link:global(.is-hovered),
+.button--link:active:not(:disabled),
+.button--link:global(.is-pressed) {
+  --btn-fg: var(--color-text-neutral-secondary);
+}
+
+.button--link:focus-visible,
+.button--link:global(.is-focused) {
+  --btn-fg: var(--color-text-neutral-primary);
+  --btn-stroke-width: var(--border-width-s);
+  --btn-stroke-color: var(--color-border-neutral-primary);
+}
+
+.button--link:disabled {
+  --btn-fg: var(--color-text-neutral-disabled);
+  --btn-stroke-width: 0px;
+}

@@ -1,0 +1,51 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+import * as TypographyStories from './typography.stories';
+
+<Meta of={TypographyStories} name="Documentación" />
+
+# Typography
+
+## Familias y pesos
+
+| Token | Fuente |
+| --- | --- |
+| `--font-family-primary` | Rubik |
+| `--font-family-inter` | Inter |
+| `--font-family-display` | Gobold Bold Italic (con Rubik de respaldo) |
+
+Gobold Bold Italic es una fuente con licencia y sin CDN público: hasta que se aloje en el proyecto, se ve Rubik.
+
+Pesos disponibles: `--font-weight-regular` (400), `--font-weight-medium` (500), `--font-weight-semibold` (600) y `--font-weight-bold` (700).
+
+## Escala
+
+Los estilos semánticos combinan peso, tamaño, interlineado y espaciado de letras en cuatro tokens:
+
+```
+--type-{estilo}-weight
+--type-{estilo}-size
+--type-{estilo}-line-height
+--type-{estilo}-letter-spacing
+```
+
+| Grupo | Estilos |
+| --- | --- |
+| Headings | `h1`, `h2`, `h3`, `h4`, `main` |
+| Subtitles | `subtitle1` a `subtitle4` |
+| Bodies | `body1` a `body5`, cada uno en `regular`, `medium` y `bold` |
+| Buttons | `button1` a `button4` |
+| Captions | `caption1` a `caption4` (semibold; `caption1` también en bold) |
+| Links | `link-xs`, `link-s`, `link-m`, `link-l` |
+
+```css
+.title {
+  font-family: var(--font-family-primary);
+  font-weight: var(--type-h2-weight);
+  font-size: var(--type-h2-size);
+  line-height: var(--type-h2-line-height);
+  letter-spacing: var(--type-h2-letter-spacing);
+}
+```
+
+Las escalas Desktop y Small Device son idénticas en el export de Figma, así que un solo set de tokens cubre ambas.
