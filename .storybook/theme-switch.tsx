@@ -1,8 +1,9 @@
-import React from 'react';
-import { useGlobals } from 'storybook/manager-api';
+import React, { useState } from 'react';
+import { DOCS_RENDERED, STORY_RENDERED } from 'storybook/internal/core-events';
+import { useChannel } from 'storybook/manager-api';
 import { styled } from 'storybook/theming';
 
-import { resolveTheme, themeGlobalKey, themeLabels, themes } from './themes';
+import { themeChannelEvent, themeLabels, themes, type Theme } from './themes';
 
 const SwitchButton = styled.button(({ theme }) => ({
   display: 'inline-flex',
@@ -42,17 +43,24 @@ const Thumb = styled.span<{ checked: boolean }>(({ checked }) => ({
   transition: 'left 150ms ease',
 }));
 
+let currentTheme: Theme = themes.light;
+
 export const ThemeSwitch = () => {
-  const [globals, updateGlobals] = useGlobals();
-  const checked = resolveTheme(globals[themeGlobalKey]) === themes.dark;
+  const [theme, setTheme] = useState<Theme>(currentTheme);
+  const emit: ReturnType<typeof useChannel> = useChannel({
+    [STORY_RENDERED]: () => emit(themeChannelEvent, currentTheme),
+    [DOCS_RENDERED]: () => emit(themeChannelEvent, currentTheme),
+  });
+  const checked = theme === themes.dark;
+
+  const toggle = () => {
+    currentTheme = checked ? themes.light : themes.dark;
+    setTheme(currentTheme);
+    emit(themeChannelEvent, currentTheme);
+  };
 
   return (
-    <SwitchButton
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      onClick={() => updateGlobals({ [themeGlobalKey]: checked ? themes.light : themes.dark })}
-    >
+    <SwitchButton type="button" role="switch" aria-checked={checked} onClick={toggle}>
       <Track checked={checked}>
         <Thumb checked={checked} />
       </Track>

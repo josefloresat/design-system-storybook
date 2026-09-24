@@ -1,24 +1,35 @@
 import type { Preview } from '@storybook/react-vite'
 import { addons } from 'storybook/preview-api'
-import { DOCS_RENDERED } from 'storybook/internal/core-events'
+import { DOCS_RENDERED, STORY_RENDERED } from 'storybook/internal/core-events'
 
 import '../src/index.css'
 import './docs-theme.css'
 import { ThemeBoundary } from './theme-boundary'
-import { resolveTheme, themeGlobalKey, themes } from './themes'
+import { applyTheme, resolveTheme, themeChannelEvent, themeParameterKey, themes, type Theme } from './themes'
 
-addons.getChannel().on(DOCS_RENDERED, () => {
-  document.documentElement.dataset.theme = themes.light
+let activeTheme: Theme = themes.light
+let locked = false
+
+const syncTheme = () => applyTheme(locked ? themes.light : activeTheme)
+
+const channel = addons.getChannel()
+channel.on(themeChannelEvent, (theme: unknown) => {
+  activeTheme = resolveTheme(theme)
+  syncTheme()
 })
+channel.on(DOCS_RENDERED, syncTheme)
+channel.on(STORY_RENDERED, syncTheme)
 
 const preview: Preview = {
-  initialGlobals: { [themeGlobalKey]: themes.light },
   decorators: [
-    (Story, { globals, viewMode }) => (
-      <ThemeBoundary theme={resolveTheme(globals[themeGlobalKey])} isDocs={viewMode === 'docs'}>
-        <Story />
-      </ThemeBoundary>
-    ),
+    (Story, { viewMode, parameters }) => {
+      locked = Boolean(parameters[themeParameterKey]?.disable)
+      return (
+        <ThemeBoundary theme={locked ? themes.light : activeTheme} isDocs={viewMode === 'docs'}>
+          <Story />
+        </ThemeBoundary>
+      )
+    },
   ],
   parameters: {
     backgrounds: { disabled: true },
@@ -30,13 +41,13 @@ const preview: Preview = {
           '02 Foundations',
           [
             'Colors',
-            ['Documentación', 'Primitivos', 'Semánticos'],
+            ['Primitivos', 'Semánticos'],
             'Typography',
-            ['Documentación', 'Familias y pesos', 'Escala'],
+            ['Familias y pesos', 'Escala'],
             'Effects & Borders',
-            ['Documentación', 'Shadows', 'Borders'],
+            ['Shadows', 'Borders'],
             'Layout & Shape',
-            ['Documentación', 'Spacing', 'Border Radius', 'Icon Size', 'Grid'],
+            ['Spacing', 'Border Radius', 'Icon Size', 'Grid'],
           ],
           '03 Componentes',
           [

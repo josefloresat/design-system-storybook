@@ -8,24 +8,23 @@ Documentación viva de los tokens de diseño y de los componentes construidos co
 
 ## Cómo está organizado
 
-| Sección | Contenido |
-| --- | --- |
-| **02 Foundations** | Los tokens, agrupados por tema. Cada grupo tiene una página de **Documentación** y una story por familia. |
-| **03 Componentes** | Componentes del sistema, construidos solo con tokens. Hoy: Button. |
+- **01 Introducción:** esta página y la guía de consumo entre equipos.
+- **02 Foundations:** los tokens, agrupados por tema. Cada grupo tiene una story por familia, con una tabla de nombre, valor y vista previa.
+- **03 Componentes:** componentes del sistema, construidos solo con tokens y organizados en las cinco categorías del Components Standard: Actions, Selections, Navigation, Feedback y Text Field. Hoy: Button, en Actions.
 
-### Foundations
+## Foundations
 
-- **Colors:** primitivos y semánticos (Light y Dark).
+- **Colors:** primitivos y semánticos.
 - **Typography:** familias, pesos y escala tipográfica.
 - **Effects & Borders:** sombras y grosores de borde.
 - **Layout & Shape:** spacing, border radius, icon size y grid.
 
+Las páginas de Foundations siempre se ven en Light: el switch de tema no aplica ahí.
+
 ## Niveles de tokens
 
-| Nivel | Qué es | Ejemplo |
-| --- | --- | --- |
-| **Primitivos** | Valores base sin propósito asociado | `--color-brand-rojo-principal`, `--color-neutral-900` |
-| **Semánticos** | Alias con propósito que consumen primitivos | `--color-bg-brand-default`, `--color-text-neutral-primary` |
+- **Primitivos:** valores base sin propósito asociado. Ejemplos: `--color-brand-rojo-principal`, `--color-neutral-900`.
+- **Semánticos:** alias con propósito que consumen primitivos. Ejemplos: `--color-bg-brand-default`, `--color-text-neutral-primary`.
 
 Siempre usa tokens semánticos en los componentes; los primitivos son solo la base de la que se derivan.
 

@@ -8,10 +8,8 @@ Este design system tiene un solo dueño (el equipo de frontend) pero más de un 
 
 ## Dos formas de consumo, un solo paquete
 
-| Entry point | Qué trae | Para quién |
-| --- | --- | --- |
-| **`ui`** | Los componentes oficiales (Button, ...) ya armados | Un equipo que necesita un componente del Components Standard tal cual está |
-| **`tokens`** | Solo las variables CSS de `src/index.css`, sin componentes | Un equipo que construye un componente propio, no estándar, que debe verse parte del sistema |
+- **`ui`:** trae los componentes oficiales (Button, ...) ya armados. Es para un equipo que necesita un componente del Components Standard tal cual está.
+- **`tokens`:** trae solo las variables CSS de `src/index.css`, sin componentes. Es para un equipo que construye un componente propio, no estándar, que debe verse parte del sistema.
 
 Ningún equipo instala "el design system" a secas — instala uno de estos dos, según lo que necesite.
 
@@ -23,7 +21,7 @@ Sea un componente oficial o uno propio de un equipo, **el valor crudo de color, 
 .casino-odds-widget {
   background: var(--color-bg-brand-default);
   color: var(--color-text-neutral-primary);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-m);
 }
 ```
 

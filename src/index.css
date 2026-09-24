@@ -221,7 +221,7 @@
   }
 }
 
-:root[data-theme='dark'] {
+[data-theme='dark'] {
   --color-bg-neutral-primary: var(--color-neutral-900);
   --color-bg-neutral-inverse: var(--color-neutral-0);
   --color-text-neutral-primary: var(--color-neutral-0);

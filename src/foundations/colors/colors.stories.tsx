@@ -1,12 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { PrimitiveColors, SemanticColors } from '../tokens/tokens';
+import { foundationsParameters } from '../tokens/foundations-parameters';
 
 const meta = {
   title: '02 Foundations/Colors',
-  parameters: {
-    layout: 'fullscreen',
-  },
+  parameters: foundationsParameters,
 } satisfies Meta;
 
 export default meta;

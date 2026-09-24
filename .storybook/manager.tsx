@@ -1,8 +1,9 @@
+import React from 'react';
 import { addons, types } from 'storybook/manager-api';
 import { create } from 'storybook/theming/create';
 
 import { ThemeSwitch } from './theme-switch';
-import { themeLabels } from './themes';
+import { themeLabels, themeParameterKey } from './themes';
 
 const theme = create({
   base: 'light',
@@ -22,6 +23,7 @@ addons.register(addonId, () => {
   addons.add(`${addonId}/tool`, {
     type: types.TOOL,
     title: themeLabels.switch,
+    paramKey: themeParameterKey,
     match: ({ viewMode }) => viewMode === 'story' || viewMode === 'docs',
     render: () => <ThemeSwitch />,
   });

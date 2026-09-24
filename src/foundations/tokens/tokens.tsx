@@ -1,12 +1,31 @@
-﻿import css from '../../index.css?raw';
-import styles from './tokens.module.css';
+import { useLayoutEffect, useRef, useState } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
-/* Every token is read from src/index.css so the docs can't drift from it. */
+import css from '../../index.css?raw';
+import styles from './tokens.module.css';
 
 interface Token {
   name: string;
   value: string;
 }
+
+interface Row {
+  key: string;
+  names: string[];
+  values: ReactNode[];
+  preview?: ReactNode;
+}
+
+const labels = {
+  name: 'Nombre',
+  value: 'Valor',
+  preview: 'Vista previa',
+  families: 'Familias',
+  weights: 'Pesos',
+  fontSample: 'Aa',
+  shadowNote: 'Los tokens definen desplazamiento, blur y spread; el color de la muestra es solo ilustrativo',
+  typeSample: 'The quick brown fox jumps over the lazy dog',
+} as const;
 
 const readVars = (source: string): Token[] =>
   [...source.matchAll(/(--[\w-]+):\s*([^;]+);/g)].map(([, name, value]) => ({
@@ -22,33 +41,106 @@ const allTokens = [...rootVars.values()];
 
 const byPrefix = (prefix: string) => allTokens.filter(({ name }) => name.startsWith(prefix));
 
+const valueOf = (name: string) => rootVars.get(name)?.value ?? '';
+
 const titleCase = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
 
-/* ------------------------------------------------------------------ Color */
+const classes = (...names: string[]) => names.join(' ');
 
-const Swatch = ({ token, label }: { token: Token; label?: string }) => (
-  <div className={styles.tokens__swatch}>
-    <div className={[styles['tokens__swatch-color'], styles['tokens__swatch-color--checker']].join(' ')}>
-      <div className={styles['tokens__swatch-fill']} style={{ background: `var(${token.name})` }} />
-    </div>
-    <div className={styles['tokens__swatch-label']}>
-      {label ?? token.name}
-      <code>{token.name}</code>
-      <code>{token.value}</code>
-    </div>
-  </div>
-);
+const tokenRow = (token: Token, preview?: ReactNode): Row => ({
+  key: token.name,
+  names: [token.name],
+  values: [token.value],
+  preview,
+});
 
-const SwatchGroup = ({ title, tokens }: { title: string; tokens: Token[] }) => (
-  <div>
-    <h3>{title}</h3>
-    <div className={styles['tokens__swatch-grid']}>
-      {tokens.map((token) => (
-        <Swatch key={token.name} token={token} label={token.name.replace('--color-', '')} />
+interface TokenTableProps {
+  rows: Row[];
+  variant?: 'text' | 'shadow';
+}
+
+const TokenTable = ({ rows, variant }: TokenTableProps) => (
+  <table className={classes(styles.tokens__table, variant ? styles[`tokens__table--${variant}`] : '')}>
+    <thead>
+      <tr>
+        <th>{labels.name}</th>
+        <th>{labels.value}</th>
+        <th className={styles['tokens__table-preview']}>{labels.preview}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map(({ key, names, values, preview }) => (
+        <tr key={key}>
+          <td>
+            <div className={styles.tokens__stack}>
+              {names.map((name) => (
+                <code className={styles.tokens__chip} key={name}>
+                  {name}
+                </code>
+              ))}
+            </div>
+          </td>
+          <td>
+            <div className={styles.tokens__stack}>
+              {values.map((value, index) => (
+                <span key={index}>{value}</span>
+              ))}
+            </div>
+          </td>
+          <td className={styles['tokens__table-preview']}>{preview}</td>
+        </tr>
       ))}
-    </div>
+    </tbody>
+  </table>
+);
+
+const TokenGroup = ({ title, ...tableProps }: TokenTableProps & { title: string }) => (
+  <div className={styles.tokens__group}>
+    <h3>{title}</h3>
+    <TokenTable {...tableProps} />
   </div>
 );
+
+const Page = ({ title, children }: { title: string; children: ReactNode }) => (
+  <div className={styles.tokens}>
+    <section className={styles.tokens__section}>
+      <h2>{title}</h2>
+      {children}
+    </section>
+  </div>
+);
+
+const ResolvedValue = ({ name }: { name: string }) => {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [resolved, setResolved] = useState('');
+
+  useLayoutEffect(() => {
+    const read = () => {
+      if (ref.current) setResolved(getComputedStyle(ref.current).getPropertyValue(name).trim());
+    };
+    read();
+    const observer = new MutationObserver(read);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => observer.disconnect();
+  }, [name]);
+
+  return <span ref={ref}>{resolved}</span>;
+};
+
+const ColorPreview = ({ name }: { name: string }) => (
+  <div className={classes(styles.tokens__preview, styles['tokens__preview--checker'])}>
+    <div className={styles['tokens__preview-fill']} style={{ background: `var(${name})` }} />
+  </div>
+);
+
+const colorRow = (token: Token): Row => ({
+  key: token.name,
+  names: [token.name],
+  values: token.value.startsWith('var(')
+    ? [token.value, <ResolvedValue key="resolved" name={token.name} />]
+    : [token.value],
+  preview: <ColorPreview name={token.name} />,
+});
 
 const primitiveColorGroups: [string, string][] = [
   ['Brand', '--color-brand-'],
@@ -61,14 +153,11 @@ const primitiveColorGroups: [string, string][] = [
 ];
 
 export const PrimitiveColors = () => (
-  <div className={styles.tokens}>
-    <section className={styles.tokens__section}>
-      <h2>Primitive color</h2>
-      {primitiveColorGroups.map(([title, prefix]) => (
-        <SwatchGroup key={prefix} title={title} tokens={byPrefix(prefix)} />
-      ))}
-    </section>
-  </div>
+  <Page title="Primitive color">
+    {primitiveColorGroups.map(([title, prefix]) => (
+      <TokenGroup key={prefix} title={title} rows={byPrefix(prefix).map(colorRow)} />
+    ))}
+  </Page>
 );
 
 const semanticColorSections: [string, string][] = [
@@ -87,20 +176,15 @@ const groupBySegment = (tokens: Token[], prefix: string) => {
 };
 
 export const SemanticColors = () => (
-  <div className={styles.tokens}>
-    <section className={styles.tokens__section}>
-      <h2>Semantic color</h2>
-      <SwatchGroup title="Overlay" tokens={byPrefix('--color-overlay-')} />
-      {semanticColorSections.map(([title, prefix]) =>
-        groupBySegment(byPrefix(prefix), prefix).map(([segment, tokens]) => (
-          <SwatchGroup key={prefix + segment} title={`${title} / ${titleCase(segment)}`} tokens={tokens} />
-        )),
-      )}
-    </section>
-  </div>
+  <Page title="Semantic color">
+    <TokenGroup title="Overlay" rows={byPrefix('--color-overlay-').map(colorRow)} />
+    {semanticColorSections.map(([title, prefix]) =>
+      groupBySegment(byPrefix(prefix), prefix).map(([segment, tokens]) => (
+        <TokenGroup key={prefix + segment} title={`${title} / ${titleCase(segment)}`} rows={tokens.map(colorRow)} />
+      )),
+    )}
+  </Page>
 );
-
-/* ------------------------------------------------------------- Typography */
 
 const typeGroups: [string, RegExp][] = [
   ['Headings', /^(h\d|main)/],
@@ -111,210 +195,143 @@ const typeGroups: [string, RegExp][] = [
   ['Links', /^link/],
 ];
 
+const typeProperties = ['weight', 'size', 'line-height', 'letter-spacing'];
+
 const typeStyles = byPrefix('--type-')
   .filter(({ name }) => name.endsWith('-size'))
   .map(({ name }) => name.slice('--type-'.length, -'-size'.length));
 
+const typeRow = (style: string): Row => {
+  const names = typeProperties.map((property) => `--type-${style}-${property}`);
+  return {
+    key: style,
+    names,
+    values: names.map(valueOf),
+    preview: (
+      <span
+        style={{
+          fontSize: `var(--type-${style}-size)`,
+          fontWeight: `var(--type-${style}-weight)`,
+          lineHeight: `var(--type-${style}-line-height)`,
+          letterSpacing: `var(--type-${style}-letter-spacing)`,
+        }}
+      >
+        {labels.typeSample}
+      </span>
+    ),
+  };
+};
+
+const FontSample = ({ style }: { style: CSSProperties }) => (
+  <span className={styles.tokens__sample} style={style}>
+    {labels.fontSample}
+  </span>
+);
+
 export const FontFamilies = () => (
-  <div className={styles.tokens}>
-    <section className={styles.tokens__section}>
-      <h2>Font family &amp; weight</h2>
-      <div className={styles['tokens__swatch-grid']}>
-        {byPrefix('--font-family-').map(({ name, value }) => (
-          <div className={styles.tokens__swatch} key={name}>
-            <div className={styles['tokens__font-sample']} style={{ fontFamily: `var(${name})` }}>
-              Aa
-            </div>
-            <div className={styles['tokens__swatch-label']}>
-              {value}
-              <code>{name}</code>
-            </div>
-          </div>
-        ))}
-        {byPrefix('--font-weight-').map(({ name, value }) => (
-          <div className={styles.tokens__swatch} key={name}>
-            <div className={styles['tokens__font-sample']} style={{ fontWeight: `var(${name})` }}>
-              Aa
-            </div>
-            <div className={styles['tokens__swatch-label']}>
-              {name.replace('--font-weight-', '')}
-              <code>{name}</code>
-              <code>{value}</code>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  </div>
+  <Page title="Font family &amp; weight">
+    <TokenGroup
+      title={labels.families}
+      rows={byPrefix('--font-family-').map((token) =>
+        tokenRow(token, <FontSample style={{ fontFamily: `var(${token.name})` }} />),
+      )}
+    />
+    <TokenGroup
+      title={labels.weights}
+      rows={byPrefix('--font-weight-').map((token) =>
+        tokenRow(token, <FontSample style={{ fontWeight: `var(${token.name})` }} />),
+      )}
+    />
+  </Page>
 );
 
 export const TypeScale = () => (
-  <div className={styles.tokens}>
-    <section className={styles.tokens__section}>
-      <h2>Semantic typography (Desktop / Small Device)</h2>
-      {typeGroups.map(([title, pattern]) => (
-        <div key={title}>
-          <h3>{title}</h3>
-          {typeStyles
-            .filter((style) => pattern.test(style))
-            .map((style) => (
-              <div className={styles['tokens__type-row']} key={style}>
-                <span>
-                  {style}
-                  <code>
-                    {rootVars.get(`--type-${style}-size`)?.value} /{' '}
-                    {rootVars.get(`--type-${style}-line-height`)?.value}
-                  </code>
-                </span>
-                <span
-                  style={{
-                    fontSize: `var(--type-${style}-size)`,
-                    fontWeight: `var(--type-${style}-weight)`,
-                    lineHeight: `var(--type-${style}-line-height)`,
-                    letterSpacing: `var(--type-${style}-letter-spacing)`,
-                  }}
-                >
-                  The quick brown fox jumps over the lazy dog
-                </span>
-              </div>
-            ))}
-        </div>
-      ))}
-    </section>
-  </div>
-);
-
-
-/* ---------------------------------------------------------- Layout & Shape */
-
-const TokenTable = ({ tokens }: { tokens: Token[] }) => (
-  <table className={styles.tokens__table}>
-    <tbody>
-      {tokens.map(({ name, value }) => (
-        <tr key={name}>
-          <td>
-            <code>{name}</code>
-          </td>
-          <td>{value}</td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
+  <Page title="Semantic typography (Desktop / Small Device)">
+    {typeGroups.map(([title, pattern]) => (
+      <TokenGroup key={title} title={title} variant="text" rows={typeStyles.filter((style) => pattern.test(style)).map(typeRow)} />
+    ))}
+  </Page>
 );
 
 export const Spacing = () => (
-  <div className={styles.tokens}>
-    <section className={styles.tokens__section}>
-      <h2>Spacing</h2>
-      {byPrefix('--spacing-').map(({ name, value }) => (
-        <div className={styles['tokens__spacing-row']} key={name}>
-          <span>{name.replace('--spacing-', '')}</span>
-          <div className={styles['tokens__spacing-bar']} style={{ width: `var(${name})` }} />
-          <span>{value}</span>
-        </div>
-      ))}
-    </section>
-  </div>
+  <Page title="Spacing">
+    <TokenTable
+      rows={byPrefix('--spacing-').map((token) =>
+        tokenRow(token, <div className={styles.tokens__bar} style={{ width: `var(${token.name})` }} />),
+      )}
+    />
+  </Page>
 );
 
 export const Radius = () => (
-  <div className={styles.tokens}>
-    <section className={styles.tokens__section}>
-      <h2>Border radius</h2>
-      <div className={styles['tokens__radius-grid']}>
-        {byPrefix('--radius-').map(({ name, value }) => (
-          <div className={styles['tokens__radius-item']} key={name}>
-            <div className={styles['tokens__radius-box']} style={{ borderRadius: `var(${name})` }} />
-            <span>{name.replace('--radius-', '')}</span>
-            <span>{value}</span>
-          </div>
-        ))}
-      </div>
-    </section>
-  </div>
+  <Page title="Border radius">
+    <TokenTable
+      rows={byPrefix('--radius-').map((token) =>
+        tokenRow(token, <div className={styles.tokens__box} style={{ borderRadius: `var(${token.name})` }} />),
+      )}
+    />
+  </Page>
 );
 
 export const IconSize = () => (
-  <div className={styles.tokens}>
-    <section className={styles.tokens__section}>
-      <h2>Icon size</h2>
-      <div className={styles['tokens__radius-grid']}>
-        {byPrefix('--icon-size-').map(({ name, value }) => (
-          <div className={styles['tokens__radius-item']} key={name}>
-            <div
-              className={styles['tokens__radius-box']}
-              style={{ width: `var(${name})`, height: `var(${name})` }}
-            />
-            <span>{name.replace('--icon-size-', '')}</span>
-            <span>{value}</span>
-          </div>
-        ))}
-      </div>
-    </section>
-  </div>
+  <Page title="Icon size">
+    <TokenTable
+      rows={byPrefix('--icon-size-').map((token) =>
+        tokenRow(
+          token,
+          <div className={styles.tokens__box} style={{ width: `var(${token.name})`, height: `var(${token.name})` }} />,
+        ),
+      )}
+    />
+  </Page>
 );
 
 export const Grid = () => (
-  <div className={styles.tokens}>
-    <section className={styles.tokens__section}>
-      <h2>Grid system</h2>
-      <TokenTable tokens={byPrefix('--grid-')} />
-    </section>
-  </div>
+  <Page title="Grid system">
+    <TokenTable rows={byPrefix('--grid-').map((token) => tokenRow(token))} />
+  </Page>
 );
-
-/* --------------------------------------------------------- Effects & Borders */
 
 export const Borders = () => (
-  <div className={styles.tokens}>
-    <section className={styles.tokens__section}>
-      <h2>Border width</h2>
-      <div className={styles['tokens__radius-grid']}>
-        {byPrefix('--border-width-').map(({ name, value }) => (
-          <div className={styles['tokens__radius-item']} key={name}>
-            <div
-              className={[styles['tokens__radius-box'], styles['tokens__radius-box--border']].join(' ')}
-              style={{ borderWidth: `var(${name})` }}
-            />
-            <span>{name.replace('--border-width-', '')}</span>
-            <span>{value}</span>
-          </div>
-        ))}
-      </div>
-    </section>
-  </div>
+  <Page title="Border width">
+    <TokenTable
+      rows={byPrefix('--border-width-').map((token) =>
+        tokenRow(
+          token,
+          <div
+            className={classes(styles.tokens__box, styles['tokens__box--border'])}
+            style={{ borderWidth: `var(${token.name})` }}
+          />,
+        ),
+      )}
+    />
+  </Page>
 );
 
-/* The export only ships shadow offsets, blur and spread (no color), so the
-   demo pairs y/blur by size and tints them with the neutral overlay. */
 const shadowSizes = ['s', 'm', 'l', 'xl'];
 
+const shadowRow = (size: string): Row => {
+  const names = ['--shadow-x-s', `--shadow-y-${size}`, `--shadow-blur-${size}`, '--shadow-spread-s'];
+  return {
+    key: size,
+    names,
+    values: names.map(valueOf),
+    preview: (
+      <div
+        className={classes(styles.tokens__box, styles['tokens__box--shadow'])}
+        style={{
+          boxShadow: `var(--shadow-x-s) var(--shadow-y-${size}) var(--shadow-blur-${size}) var(--shadow-spread-s) var(--color-overlay-20)`,
+        }}
+      />
+    ),
+  };
+};
+
 export const Shadows = () => (
-  <div className={styles.tokens}>
-    <section className={styles.tokens__section}>
-      <h2>Shadow system</h2>
-      <p className={styles.tokens__note}>
-        Los tokens definen desplazamiento, blur y spread; el color de la muestra es solo ilustrativo
-        (<code>--color-overlay-20</code>).
-      </p>
-      <div className={[styles['tokens__radius-grid'], styles['tokens__radius-grid--shadow']].join(' ')}>
-        {shadowSizes.map((size) => (
-          <div className={styles['tokens__radius-item']} key={size}>
-            <div
-              className={[styles['tokens__radius-box'], styles['tokens__radius-box--shadow']].join(' ')}
-              style={{
-                boxShadow: `var(--shadow-x-s) var(--shadow-y-${size}) var(--shadow-blur-${size}) var(--shadow-spread-s) var(--color-overlay-20)`,
-              }}
-            />
-            <span>{size}</span>
-            <span>
-              y {rootVars.get(`--shadow-y-${size}`)?.value} / blur{' '}
-              {rootVars.get(`--shadow-blur-${size}`)?.value}
-            </span>
-          </div>
-        ))}
-      </div>
-      <TokenTable tokens={byPrefix('--shadow-')} />
-    </section>
-  </div>
+  <Page title="Shadow system">
+    <p className={styles.tokens__note}>
+      {labels.shadowNote} (<code>--color-overlay-20</code>).
+    </p>
+    <TokenTable variant="shadow" rows={shadowSizes.map(shadowRow)} />
+  </Page>
 );
