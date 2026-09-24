@@ -32,7 +32,7 @@ const preview: Preview = {
     },
   ],
   parameters: {
-    backgrounds: { disabled: true },
+    backgrounds: { options: {} },
     options: {
       storySort: {
         order: [
