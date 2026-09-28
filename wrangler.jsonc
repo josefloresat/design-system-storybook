@@ -1,0 +1,8 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "design-system-storybook",
+  "compatibility_date": "2026-09-28",
+  "assets": {
+    "directory": "./storybook-static"
+  }
+}
