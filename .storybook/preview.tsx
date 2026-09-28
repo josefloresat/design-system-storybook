@@ -2,6 +2,7 @@ import type { Preview } from '@storybook/react-vite'
 import { addons } from 'storybook/preview-api'
 import { DOCS_RENDERED, STORY_RENDERED } from 'storybook/internal/core-events'
 
+import './fonts.css'
 import '../src/index.css'
 import './docs-theme.css'
 import { ThemeBoundary } from './theme-boundary'
