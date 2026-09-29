@@ -53,6 +53,24 @@ const titleCase = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
 
 const classes = (...names: string[]) => names.join(' ');
 
+const stepFamilies = new Set(['green', 'yellow', 'blue', 'red']);
+
+const naturalName = (reference: string) => {
+  const name = reference.match(/^var\(--color-([\w-]+)\)$/)?.[1];
+  if (!name) return reference;
+  const [family, ...rest] = name.split('-');
+  const step = rest.join('-');
+  return stepFamilies.has(family) ? `${family}/${family}-${step}` : `${family}/${step}`;
+};
+
+const friendlyColor = (value: string) => {
+  const match = value.match(/^rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)$/);
+  if (!match) return value;
+  const [, r, g, b, alpha] = match;
+  const hex = [r, g, b].map((channel) => Number(channel).toString(16).padStart(2, '0')).join('');
+  return `#${hex} al ${Math.round(Number(alpha) * 100)}%`;
+};
+
 const tokenRow = (token: Token, preview?: ReactNode): Row => ({
   key: token.name,
   names: [token.name],
@@ -137,7 +155,7 @@ const ResolvedValue = ({ name }: { name: string }) => {
 
   useLayoutEffect(() => {
     const read = () => {
-      if (ref.current) setResolved(getComputedStyle(ref.current).getPropertyValue(name).trim());
+      if (ref.current) setResolved(friendlyColor(getComputedStyle(ref.current).getPropertyValue(name).trim()));
     };
     read();
     const observer = new MutationObserver(read);
@@ -158,8 +176,8 @@ const colorRow = (token: Token): Row => ({
   key: token.name,
   names: [token.name],
   values: token.value.startsWith('var(')
-    ? [token.value, <ResolvedValue key="resolved" name={token.name} />]
-    : [token.value],
+    ? [naturalName(token.value), <ResolvedValue key="resolved" name={token.name} />]
+    : [friendlyColor(token.value)],
   preview: <ColorPreview name={token.name} />,
 });
 
@@ -169,7 +187,7 @@ const DarkValue = ({ token }: { token: Token }) => {
   return (
     <div className={styles.tokens__dark}>
       <div className={styles.tokens__stack}>
-        <span>{declared}</span>
+        <span>{naturalName(friendlyColor(declared))}</span>
         {declared.startsWith('var(') && <ResolvedValue name={token.name} />}
       </div>
       <ColorPreview name={token.name} />
