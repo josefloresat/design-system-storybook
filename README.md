@@ -20,14 +20,27 @@ Guárdalo como variable de entorno `GITHUB_PACKAGES_TOKEN`. En Windows (PowerShe
 
 Reinicia la terminal para que se tome. En CI o en Cloudflare Workers Builds, crea una variable de build con el mismo nombre.
 
-### 2. `.npmrc` en la raíz de tu proyecto
+### 2. `.npmrc`: registro en el proyecto, token en tu usuario
+
+En la raíz de tu proyecto, un `.npmrc` que se commitea y solo dice de dónde sale el scope:
 
 ```ini
 @josefloresat:registry=https://npm.pkg.github.com
+```
+
+La línea del token va en tu `.npmrc` de usuario (`~/.npmrc`, en Windows `C:\Users\<tu usuario>\.npmrc`), fuera de cualquier repo:
+
+```ini
 //npm.pkg.github.com/:_authToken=${GITHUB_PACKAGES_TOKEN}
 ```
 
-Se commitea tal cual: el token nunca se escribe en el archivo, solo se lee de la variable de entorno.
+Así el token nunca se escribe en un archivo: se lee de la variable de entorno. pnpm 11 ignora esa línea si está en el `.npmrc` del proyecto, porque no expande variables de entorno en credenciales de un archivo commiteado.
+
+En CI (por ejemplo Cloudflare Workers Builds), antes de instalar:
+
+```sh
+pnpm config set "//npm.pkg.github.com/:_authToken" "$GITHUB_PACKAGES_TOKEN"
+```
 
 ### 3. Dependencia con alias
 
