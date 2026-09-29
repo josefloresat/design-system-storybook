@@ -1,8 +1,14 @@
 {
-  "name": "@apuesta-total/design-system",
-  "private": true,
+  "name": "@josefloresat/design-system",
   "version": "0.2.0",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/josefloresat/sportbook-storybook.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "files": [
     "dist"
   ],

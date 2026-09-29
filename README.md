@@ -6,24 +6,44 @@ El catálogo visual de cada componente (variantes, tamaños y estados) está en 
 
 ## Instalación
 
-Durante la fase de pruebas el paquete se distribuye como un tarball generado con `npm pack`; todavía no está publicado en ningún registro.
+El paquete está publicado en GitHub Packages como `@josefloresat/design-system`. Ese nombre es temporal, mientras no exista la organización de la empresa en GitHub. En tu app se instala con un alias, así que siempre lo importas como `@apuesta-total/design-system` y tu código no cambia cuando el paquete pase a su nombre final.
 
-El Owner team genera el tarball desde este repositorio:
+### 1. Token de lectura
 
-```sh
-npm run build
-npm pack
+GitHub Packages pide autenticación incluso para instalar. Crea un token **classic** (los fine-grained no sirven para el registro npm) en GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic), solo con el permiso `read:packages`.
+
+Guárdalo como variable de entorno `GITHUB_PACKAGES_TOKEN`. En Windows (PowerShell):
+
+```powershell
+[Environment]::SetEnvironmentVariable('GITHUB_PACKAGES_TOKEN', '<token>', 'User')
 ```
 
-Eso produce `apuesta-total-design-system-<versión>.tgz`. Cópialo a tu proyecto e instálalo como una dependencia más:
+Reinicia la terminal para que se tome. En CI o en Cloudflare Workers Builds, crea una variable de build con el mismo nombre.
 
-```sh
-pnpm add ./apuesta-total-design-system-0.1.0.tgz
-# o
-npm install ./apuesta-total-design-system-0.1.0.tgz
+### 2. `.npmrc` en la raíz de tu proyecto
+
+```ini
+@josefloresat:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_PACKAGES_TOKEN}
 ```
 
-En Windows, pnpm guarda la ruta en `package.json` con `\`; cámbiala a `/` (`"file:../../vendor/apuesta-total-design-system-0.1.0.tgz"`) para que la instalación funcione en cualquier sistema operativo. Cada vez que recibas un tarball nuevo con la misma versión, vuelve a ejecutar el `pnpm add` para que se actualice el lockfile.
+Se commitea tal cual: el token nunca se escribe en el archivo, solo se lee de la variable de entorno.
+
+### 3. Dependencia con alias
+
+```sh
+pnpm add @apuesta-total/design-system@npm:@josefloresat/design-system@^0.2.0
+```
+
+Eso deja en tu `package.json`:
+
+```json
+"@apuesta-total/design-system": "npm:@josefloresat/design-system@^0.2.0"
+```
+
+Si tu proyecto usa la política `minimumReleaseAge` de pnpm, agrega `@josefloresat/*` a `minimumReleaseAgeExclude` en `pnpm-workspace.yaml`; si no, pnpm rechaza las versiones recién publicadas.
+
+Para actualizar a una versión nueva: `pnpm update @apuesta-total/design-system`.
 
 El paquete usa el React de tu app (`react` y `react-dom` `^19` son `peerDependencies`), así que nunca vas a tener dos copias de React.
 
@@ -117,3 +137,14 @@ El paquete sigue semver:
 - **Patch:** una corrección visual para ajustarse a Figma.
 
 La versión empieza en `0.1.0` y pasa a `1.0.0` cuando el primer equipo salga a producción. Todos los módulos de la web deben converger a la última versión dentro del plazo acordado, para que la misma web no muestre dos versiones de un componente.
+
+## Publicar una versión (Owner team)
+
+Las versiones las publica GitHub Actions (`.github/workflows/publish.yml`) al subir un tag `v*`. Nunca se publica desde una laptop.
+
+```sh
+npm version minor   # o patch / major, según las reglas de arriba; crea el commit y el tag vX.Y.Z
+git push origin main --follow-tags
+```
+
+El workflow falla si el tag no coincide con la `version` de `package.json`. Una versión publicada no se puede volver a publicar: cada cambio es una versión nueva.
