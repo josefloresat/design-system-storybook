@@ -1,18 +1,33 @@
 {
-  "name": "sportbook-storybook",
+  "name": "@apuesta-total/design-system",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./tokens.css": "./dist/tokens.css"
+  },
   "scripts": {
+    "build": "vite build --config vite.lib.config.ts && tsc -p tsconfig.lib.json",
     "typecheck": "tsc -b",
     "lint": "eslint .",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "deploy": "npm run build-storybook && wrangler deploy"
   },
-  "dependencies": {
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+  "peerDependencies": {
+    "react": "^19",
+    "react-dom": "^19"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "latest",
@@ -34,6 +49,8 @@
     "eslint-plugin-storybook": "^10.6.0",
     "globals": "^17.12.0",
     "playwright": "latest",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "storybook": "^10.6.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.69.0",
