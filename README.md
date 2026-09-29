@@ -1,6 +1,6 @@
 # @apuesta-total/design-system
 
-Design system oficial de Apuesta Total: los tokens de diseño y los componentes oficiales de React, construidos 1:1 desde Figma. Esta guía es para los equipos que consumen el paquete desde su propia app de Next.js.
+Design system oficial de Apuesta Total: los tokens de diseño y los componentes oficiales de React, construidos 1:1 desde Figma. Esta guía es para los equipos que consumen el paquete desde su propia app de Next.js. La última sección, *Publicar y desplegar*, es para el Owner team.
 
 El catálogo visual de cada componente (variantes, tamaños y estados) está en el Storybook de este mismo repositorio.
 
@@ -151,13 +151,90 @@ El paquete sigue semver:
 
 La versión empieza en `0.1.0` y pasa a `1.0.0` cuando el primer equipo salga a producción. Todos los módulos de la web deben converger a la última versión dentro del plazo acordado, para que la misma web no muestre dos versiones de un componente.
 
-## Publicar una versión (Owner team)
+## Publicar y desplegar (Owner team)
 
-Las versiones las publica GitHub Actions (`.github/workflows/publish.yml`) al subir un tag `v*`. Nunca se publica desde una laptop.
+Un cambio en este repositorio llega a dos lugares, y cada uno se dispara por separado:
+
+| Qué | Cómo se dispara | Dónde queda |
+| --- | --- | --- |
+| **Paquete** `@josefloresat/design-system` | Subir un tag `vX.Y.Z` | GitHub Packages (lo publica GitHub Actions) |
+| **Storybook** (catálogo y documentación) | Subir cualquier commit a `main` | Cloudflare Workers (lo despliega Workers Builds) |
+
+Nunca se publica el paquete desde una laptop: `publishConfig.registry` apunta a GitHub Packages, así que `npm publish` local no puede llegar a npmjs.com, y el workflow es la única vía oficial.
+
+### 1. Antes de subir nada
+
+Corre todo desde la carpeta `sportbook-storybook` y no sigas si algo falla:
 
 ```sh
-npm version minor   # o patch / major, según las reglas de arriba; crea el commit y el tag vX.Y.Z
-git push origin main --follow-tags
+npm run typecheck
+npm run lint
+npx vitest run          # cada story es un test en Chromium
+npm run build           # arma el paquete en dist/
+npm run build-storybook # arma el Storybook en storybook-static/
 ```
 
-El workflow falla si el tag no coincide con la `version` de `package.json`. Una versión publicada no se puede volver a publicar: cada cambio es una versión nueva.
+Para ver qué archivos saldrían en el paquete sin publicar nada: `npm publish --dry-run`.
+
+Si cambiaste tokens o componentes, revisa también en Storybook (`npm run storybook`, puerto 6006) el switch «Tema oscuro» y los Foundations. Los documentos `DESIGN.md` y `CONTEXT.md` viven fuera de este repositorio, un nivel arriba; se actualizan a mano y no viajan con el paquete.
+
+### 2. Elegir la versión
+
+Aplica las reglas de la sección *Versionado*:
+
+| Cambio | Comando |
+| --- | --- |
+| Corrección visual para ajustarse a Figma | `npm version patch` |
+| Componente, variante o token nuevo (también cambios de valores de color visibles) | `npm version minor` |
+| Renombrar o eliminar un token, o cambiar una prop o un valor de `variant`/`size` | `npm version major` |
+
+Cambios solo de documentación o de Storybook (por ejemplo, las tablas de Foundations) no necesitan versión nueva: basta el push a `main`.
+
+### 3. Publicar el paquete y desplegar Storybook
+
+Con el árbol de trabajo limpio (todo commiteado):
+
+```sh
+npm version minor                     # o patch / major: sube package.json, crea el commit y el tag vX.Y.Z
+git push origin main --follow-tags    # sube los commits y el tag
+```
+
+Ese único push hace dos cosas:
+
+1. **El tag `vX.Y.Z`** dispara `.github/workflows/publish.yml`: verifica que el tag coincida con la `version` de `package.json`, corre `npm ci` y `npm run build`, y ejecuta `npm publish` hacia GitHub Packages.
+2. **El commit en `main`** dispara el deploy de Storybook en Cloudflare.
+
+Si solo cambiaste documentación y no quieres versión nueva, haz `git push origin main` sin tag.
+
+### 4. Verificar
+
+- **Paquete:** pestaña *Actions* del repositorio en GitHub, workflow *Publish package*, en verde. La versión aparece en *Packages* del repositorio. Desde una app consumidora: `pnpm update @apuesta-total/design-system` y revisa la versión resuelta en el lockfile.
+- **Storybook:** Cloudflare dashboard → *Workers & Pages* → `design-system-storybook` → *Deployments*, con el último build en verde. Abre la URL `workers.dev` del proyecto y revisa la página que cambiaste.
+
+### 5. Cloudflare (Storybook)
+
+El repositorio ya trae la configuración: `wrangler.jsonc` sirve la carpeta `./storybook-static` como archivos estáticos (Worker `design-system-storybook`, con `workers_dev` y `preview_urls` activos).
+
+- **Cada push a `main`** redespliega la URL de producción.
+- **Cada push a otra rama** genera una *preview URL* propia, útil para revisar un cambio antes de mezclarlo.
+
+Está conectado con **Workers Builds**. Si hay que volver a conectarlo: Cloudflare dashboard → *Workers & Pages* → *Create* → *Import a repository* → `sportbook-storybook`, rama de producción `main`, con:
+
+- Build command: `npm run build-storybook`
+- Deploy command: `npx wrangler deploy`
+
+**Plan B, desde tu laptop** (si Workers Builds está caído o necesitas desplegar sin pasar por Git):
+
+```sh
+npx wrangler login    # una sola vez por máquina
+npm run deploy        # build-storybook + wrangler deploy
+```
+
+Esto despliega lo que tengas en tu carpeta, aunque no esté commiteado. Úsalo solo en una emergencia y sube después el mismo código a `main`, para que Git y el sitio no queden desalineados.
+
+### 6. Si algo sale mal
+
+- **El workflow falla por «Tag … does not match package.json version»:** borra el tag (`git tag -d vX.Y.Z` y `git push origin :refs/tags/vX.Y.Z`), corrige la versión y vuelve a crear el tag.
+- **Una versión ya publicada tiene un error:** no se puede republicar ni sobrescribir. Corrige y publica la siguiente (`patch`). Los equipos pueden fijar la versión anterior mientras tanto (`@josefloresat/design-system@0.2.0` en su `package.json`, sin `^`).
+- **Storybook quedó mal en Cloudflare:** dashboard → *Deployments* → elige el deploy anterior → *Rollback*. Luego corrige en `main`.
+- **El build de Cloudflare falla:** revisa el log del build en *Deployments*. Casi siempre es lo mismo que falla en local con `npm run build-storybook`, así que reprodúcelo ahí primero.
