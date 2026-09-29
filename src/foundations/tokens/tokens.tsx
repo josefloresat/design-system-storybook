@@ -183,6 +183,7 @@ export const SemanticColors = () => (
         <TokenGroup key={prefix + segment} title={`${title} / ${titleCase(segment)}`} rows={tokens.map(colorRow)} />
       )),
     )}
+    <TokenGroup title="Components" rows={byPrefix('--color-components-').map(colorRow)} />
   </Page>
 );
 
