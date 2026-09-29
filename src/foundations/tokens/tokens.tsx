@@ -14,12 +14,15 @@ interface Row {
   names: string[];
   values: ReactNode[];
   preview?: ReactNode;
+  dark?: ReactNode;
 }
 
 const labels = {
   name: 'Nombre',
   value: 'Valor',
   preview: 'Vista previa',
+  dark: 'Dark',
+  sameInDark: 'Igual que en Light',
   families: 'Familias',
   weights: 'Pesos',
   fontSample: 'Aa',
@@ -38,6 +41,9 @@ readVars(css).forEach((token) => {
   if (!rootVars.has(token.name)) rootVars.set(token.name, token);
 });
 const allTokens = [...rootVars.values()];
+
+const darkBlock = css.match(/\[data-theme='dark'\]\s*\{([^}]*)\}/)?.[1] ?? '';
+const darkVars = new Map(readVars(darkBlock).map(({ name, value }) => [name, value]));
 
 const byPrefix = (prefix: string) => allTokens.filter(({ name }) => name.startsWith(prefix));
 
@@ -59,40 +65,55 @@ interface TokenTableProps {
   variant?: 'text' | 'shadow';
 }
 
-const TokenTable = ({ rows, variant }: TokenTableProps) => (
-  <table className={classes(styles.tokens__table, variant ? styles[`tokens__table--${variant}`] : '')}>
-    <thead>
-      <tr>
-        <th>{labels.name}</th>
-        <th>{labels.value}</th>
-        <th className={styles['tokens__table-preview']}>{labels.preview}</th>
-      </tr>
-    </thead>
-    <tbody>
-      {rows.map(({ key, names, values, preview }) => (
-        <tr key={key}>
-          <td>
-            <div className={styles.tokens__stack}>
-              {names.map((name) => (
-                <code className={styles.tokens__chip} key={name}>
-                  {name}
-                </code>
-              ))}
-            </div>
-          </td>
-          <td>
-            <div className={styles.tokens__stack}>
-              {values.map((value, index) => (
-                <span key={index}>{value}</span>
-              ))}
-            </div>
-          </td>
-          <td className={styles['tokens__table-preview']}>{preview}</td>
+const TokenTable = ({ rows, variant }: TokenTableProps) => {
+  const hasDark = rows.some(({ dark }) => dark !== undefined);
+  const tableClass = classes(
+    styles.tokens__table,
+    variant ? styles[`tokens__table--${variant}`] : '',
+    hasDark ? styles['tokens__table--dark'] : '',
+  );
+
+  return (
+    <table className={tableClass}>
+      <thead>
+        <tr>
+          <th>{labels.name}</th>
+          <th>{labels.value}</th>
+          <th className={styles['tokens__table-preview']}>{labels.preview}</th>
+          {hasDark && <th>{labels.dark}</th>}
         </tr>
-      ))}
-    </tbody>
-  </table>
-);
+      </thead>
+      <tbody>
+        {rows.map(({ key, names, values, preview, dark }) => (
+          <tr key={key}>
+            <td>
+              <div className={styles.tokens__stack}>
+                {names.map((name) => (
+                  <code className={styles.tokens__chip} key={name}>
+                    {name}
+                  </code>
+                ))}
+              </div>
+            </td>
+            <td>
+              <div className={styles.tokens__stack}>
+                {values.map((value, index) => (
+                  <span key={index}>{value}</span>
+                ))}
+              </div>
+            </td>
+            <td className={styles['tokens__table-preview']}>{preview}</td>
+            {hasDark && (
+              <td className={styles['tokens__table-dark']} data-theme="dark">
+                {dark}
+              </td>
+            )}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+};
 
 const TokenGroup = ({ title, ...tableProps }: TokenTableProps & { title: string }) => (
   <div className={styles.tokens__group}>
@@ -142,6 +163,25 @@ const colorRow = (token: Token): Row => ({
   preview: <ColorPreview name={token.name} />,
 });
 
+const DarkValue = ({ token }: { token: Token }) => {
+  const declared = darkVars.get(token.name);
+  if (!declared) return <span className={styles.tokens__same}>{labels.sameInDark}</span>;
+  return (
+    <div className={styles.tokens__dark}>
+      <div className={styles.tokens__stack}>
+        <span>{declared}</span>
+        {declared.startsWith('var(') && <ResolvedValue name={token.name} />}
+      </div>
+      <ColorPreview name={token.name} />
+    </div>
+  );
+};
+
+const semanticColorRow = (token: Token): Row => ({
+  ...colorRow(token),
+  dark: <DarkValue token={token} />,
+});
+
 const primitiveColorGroups: [string, string][] = [
   ['Brand', '--color-brand-'],
   ['Green', '--color-green-'],
@@ -177,13 +217,13 @@ const groupBySegment = (tokens: Token[], prefix: string) => {
 
 export const SemanticColors = () => (
   <Page title="Semantic color">
-    <TokenGroup title="Overlay" rows={byPrefix('--color-overlay-').map(colorRow)} />
+    <TokenGroup title="Overlay" rows={byPrefix('--color-overlay-').map(semanticColorRow)} />
     {semanticColorSections.map(([title, prefix]) =>
       groupBySegment(byPrefix(prefix), prefix).map(([segment, tokens]) => (
-        <TokenGroup key={prefix + segment} title={`${title} / ${titleCase(segment)}`} rows={tokens.map(colorRow)} />
+        <TokenGroup key={prefix + segment} title={`${title} / ${titleCase(segment)}`} rows={tokens.map(semanticColorRow)} />
       )),
     )}
-    <TokenGroup title="Components" rows={byPrefix('--color-components-').map(colorRow)} />
+    <TokenGroup title="Components" rows={byPrefix('--color-components-').map(semanticColorRow)} />
   </Page>
 );
 
