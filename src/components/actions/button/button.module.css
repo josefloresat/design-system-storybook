@@ -97,7 +97,7 @@
 
 .button--primary {
   --btn-bg: var(--color-bg-brand-default);
-  --btn-fg: var(--color-bg-neutral-primary);
+  --btn-fg: var(--color-components-txt-white);
 }
 
 .button--primary:hover:not(:disabled),
