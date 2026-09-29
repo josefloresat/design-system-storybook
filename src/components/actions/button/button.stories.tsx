@@ -62,7 +62,6 @@ const STATES = [
   { name: 'Focused', className: 'is-focused', disabled: false },
 ];
 
-/** Every size, variant and state of the system, forced with helper classes so they can be compared at once */
 export const AllVariants: Story = {
   parameters: { layout: 'padded' },
   render: (args) => (

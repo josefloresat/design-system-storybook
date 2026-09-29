@@ -7,19 +7,13 @@ export type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'link';
 
 export interface ButtonProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
-  /** Height and density of the button */
   size?: ButtonSize;
-  /** Visual hierarchy of the button */
   variant?: ButtonVariant;
-  /** Text shown inside the button */
   label?: string;
-  /** Show the leading chevron */
   iconLeft?: boolean;
-  /** Show the trailing chevron */
   iconRight?: boolean;
 }
 
-/** Action trigger of the system, in four hierarchies and four sizes. Hover, pressed, focus and disabled states are handled by CSS */
 export const Button = ({
   size = 'md',
   variant = 'primary',
