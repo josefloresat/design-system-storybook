@@ -15,6 +15,7 @@ const config: StorybookConfig = {
   "docs": {
     "defaultName": "Documentación"
   },
+  "staticDirs": ["./public"],
   "framework": "@storybook/react-vite"
 };
 export default config;
