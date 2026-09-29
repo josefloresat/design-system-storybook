@@ -118,7 +118,7 @@
 }
 
 .button--primary:disabled {
-  --btn-bg: var(--color-bg-neutral-disabled);
+  --btn-bg: var(--color-border-neutral-disabled);
   --btn-fg: var(--color-text-neutral-gris-1);
   --btn-stroke-width: 0px;
   --btn-elevation: 0 0 0 0 transparent;
@@ -145,7 +145,7 @@
 
 .button--secondary:focus-visible,
 .button--secondary:global(.is-focused) {
-  --btn-fg: var(--color-text-brand-secondary);
+  --btn-fg: var(--color-text-brand-primary);
   --btn-stroke-width: var(--border-width-s);
   --btn-stroke-color: var(--color-border-neutral-primary);
 }
@@ -159,8 +159,8 @@
 }
 
 .button--tertiary {
-  --btn-bg: var(--color-bg-neutral-primary);
-  --btn-fg: var(--color-text-neutral-primary);
+  --btn-bg: var(--color-components-bg-white);
+  --btn-fg: var(--color-components-txt-black);
 }
 
 .button--tertiary:hover:not(:disabled),
@@ -176,7 +176,7 @@
 
 .button--tertiary:focus-visible,
 .button--tertiary:global(.is-focused) {
-  --btn-bg: var(--color-bg-neutral-primary);
+  --btn-bg: var(--color-components-bg-white);
   --btn-stroke-width: var(--border-width-s);
   --btn-stroke-color: var(--color-border-neutral-primary);
 }
