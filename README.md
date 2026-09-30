@@ -45,13 +45,13 @@ pnpm config set "//npm.pkg.github.com/:_authToken" "$GITHUB_PACKAGES_TOKEN"
 ### 3. Dependencia con alias
 
 ```sh
-pnpm add @apuesta-total/design-system@npm:@josefloresat/design-system@^0.2.0
+pnpm add @apuesta-total/design-system@npm:@josefloresat/design-system@^0.3.0
 ```
 
 Eso deja en tu `package.json`:
 
 ```json
-"@apuesta-total/design-system": "npm:@josefloresat/design-system@^0.2.0"
+"@apuesta-total/design-system": "npm:@josefloresat/design-system@^0.3.0"
 ```
 
 Si tu proyecto usa la política `minimumReleaseAge` de pnpm, agrega `@josefloresat/*` a `minimumReleaseAgeExclude` en `pnpm-workspace.yaml`; si no, pnpm rechaza las versiones recién publicadas.
